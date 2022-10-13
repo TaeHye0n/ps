@@ -48,11 +48,8 @@ void dfs(int idx, int cnt) {
 		return;
 	}
 	for (int i = idx; i < chickenSize; i++) {
-		if (selected[i] == true) continue;
-		selected[i] = true;
 		temp.push_back(chicken[i]);
-		dfs(i, cnt + 1);
-		selected[i] = false;
+		dfs(i+1, cnt + 1);	
 		temp.pop_back();
 	}
 
