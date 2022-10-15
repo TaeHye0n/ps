@@ -1,6 +1,4 @@
 #include<iostream>
-#include <vector>
-#include <queue>
 using namespace std;
 
 int N;
@@ -32,9 +30,7 @@ void input() {
 	}
 }
 
-bool inRange(int y, int x) {
-	return y >= 0 && x >= 0 && y < N&& x < N;
-}
+
 void blowSand(int y, int x, int dir) {
 	int first = map[y][x];
 
