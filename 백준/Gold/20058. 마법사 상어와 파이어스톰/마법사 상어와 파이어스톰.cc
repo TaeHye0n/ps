@@ -15,13 +15,14 @@ int L[1001];
 int dy[4] = { 1,-1,0,0 };
 int dx[4] = { 0,0,1,-1 };
 
+queue < pair<int, int>> q;
 void input() {
 	cin >> N;
 	cin >> Q;
 	N = pow(2, N);
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
-			cin >> map[i][j];	
+			cin >> map[i][j];
 		}
 	}
 	for (int i = 0; i < Q; i++) {
@@ -83,13 +84,9 @@ void getRemain() {
 		}
 	}
 }
-void bfs(int y, int x) {
-	int size = 0;
-	queue < pair<int, int>> q;
-	q.push({ y,x });
-	vi[y][x] = false;
-
-	while (!q.empty()) {
+void bfs() {
+	int size = 1;
+	while (!q.empty()) { 
 		int y = q.front().first;
 		int x = q.front().second;
 		q.pop();
@@ -114,7 +111,9 @@ void getMaxCluster() {
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
 			if (map[i][j] > 0) {
-				bfs(i, j);
+				q.push({ i,j });
+				vi[i][j] = true;
+				bfs();
 				memset(vi, false, sizeof(vi));
 			}
 		}
