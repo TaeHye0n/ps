@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
 using namespace std;
 
 int N, M;
@@ -38,7 +37,6 @@ void permute(int idx, int cnt) {
 
 int main() {
 	input();
-	sort(v.begin(), v.end());
 	permute(0, 0);
 	return 0;
 }
