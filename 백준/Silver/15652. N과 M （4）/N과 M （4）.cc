@@ -27,23 +27,13 @@ void permute(int idx, int cnt) {
 		return;
 	}
 
-	for (int i = 0; i < N; i++) {
-		if (!temp.empty()) {
-			if (temp.back() <= v[i]) {
-				temp.push_back(v[i]);
-				permute(i, cnt + 1);
-				temp.pop_back();
-			}
-		}
-		else {
-			temp.push_back(v[i]);
-			permute(i, cnt + 1);
-			temp.pop_back();
-		}
-
+	for (int i = idx; i < N; i++) {
+		temp.push_back(v[i]);
+		permute(i, cnt + 1);
+		temp.pop_back();
 	}
 }
-				
+
 
 
 int main() {
