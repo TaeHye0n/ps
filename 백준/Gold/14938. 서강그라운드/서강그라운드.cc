@@ -26,7 +26,7 @@ void input() {
 }
 
 void init() {
-	for (int i = 1; i < MAX; i++) {
+	for (int i = 1; i <= n; i++) {
 		dist[i] = INF;
 	}
 }
@@ -61,7 +61,7 @@ int main() {
 	for (int i = 1; i <= n; i++) {
 		dijkstra(i);
 		int sum = 0;
-		for (int j = 1; j < MAX; j++) {
+		for (int j = 1; j <= n; j++) {
 			if (dist[j] <= m) {
 				sum += items[j];
 			}
