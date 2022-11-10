@@ -18,16 +18,19 @@ void input() {
 }
 
 void solve() {
-	priority_queue<int> pq;
-	for (int i = 10000; i > 0; i--) {
-		for (int j = 0; j < n; j++) {
-			if (i == v[j].first) pq.push(v[j].second);
-		}
-		if (!pq.empty()) {
-			ans += pq.top();
+	sort(v.begin(), v.end());
+	priority_queue<int, vector<int>, greater<int>> pq;
+
+	for (int i = 0; i < n; i++) {
+		pq.push(v[i].second);
+		ans += v[i].second;
+
+		if (pq.size() > v[i].first) {
+			ans -= pq.top();
 			pq.pop();
 		}
 	}
+	
 }
 
 int main() {
