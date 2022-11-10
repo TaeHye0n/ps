@@ -14,7 +14,7 @@ int main() {
 
 	for (int i = 2; i <= N; i++) {
 		for (int j = 0; j <= 9; j++) {
-			for (int k = j; k <= 9; k++) {
+			for (int k = 0; k <= j; k++) {
 				dp[i][j] += (dp[i - 1][k]) % mod;
 			}
 		}
