@@ -2,22 +2,30 @@
 
 using namespace std;
 
+const int MAX = 1e6 + 1;
 int M, N;
+int arr[MAX];
+
 void input() {
 	cin >> M >> N;
 }
 
 void solve() {
-	for (int i = M; i <= N; i++) {
+	for (int i = 2; i <= N; i++) {
 		if (i == 1) continue;
-		if (i == 2) cout << 2 << "\n";
-		else {
-			bool flag = false;
-			for (int j = 2; j * j <= i; j++) {
-				if (i % j == 0) flag = true;
+		arr[i] = i;
+	}
+
+	for (int i = 2; i * i <= N; i++) {
+		if (arr[i] != 0) {
+			for (int j = i * 2; j <= N; j += i) {
+				arr[j] = 0;
 			}
-			if (!flag) cout << i << "\n";
 		}
+	}
+
+	for (int i = M; i <= N; i++) {
+		if (arr[i] != 0) cout << i << "\n";
 	}
 }
 
