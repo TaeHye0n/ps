@@ -15,7 +15,7 @@ void input() {
 }
 
 void solve() {
-	dp[1][1] = nums[1];
+	dp[1][1] = 0;
 	dp[1][0] = nums[1];
 	int ans = nums[1];
 
