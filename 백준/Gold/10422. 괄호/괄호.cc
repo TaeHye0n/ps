@@ -12,7 +12,7 @@ void solve() {
 	dp[2] = 1;
 
 	for (int i = 3; i < 5001; i++) {
-		for (int j = 2; j <= i; j += 2) {
+		for (int j = 2; j <= i; j+=2) {
 			dp[i] += (dp[j - 2] * dp[i - j]) % mod;
 		}
 		dp[i] %= mod;
@@ -31,8 +31,7 @@ int main() {
 		int L;
 		cin >> L;
 
-		if (L % 2 != 0) cout << 0 << "\n";
-		else cout << dp[L] << "\n";
+		cout << dp[L] << "\n";
 	}
 	return 0;
 }
