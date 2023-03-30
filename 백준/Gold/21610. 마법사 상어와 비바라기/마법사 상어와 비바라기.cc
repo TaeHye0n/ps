@@ -6,11 +6,11 @@ using namespace std;
 
 int N, M;
 int ans;
-int A[101][101];
+int A[51][51];
 int dy[8] = { 0,-1,-1,-1,0,1,1,1 };
 int dx[8] = { -1,-1,0,1,1,1,0,-1 };
 vector<pair<int, int>> cmd;
-bool cloud[101][101];
+bool cloud[51][51];
 
 void input() {
 	cin >> N >> M;
