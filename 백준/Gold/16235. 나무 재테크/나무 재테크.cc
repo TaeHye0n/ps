@@ -40,20 +40,21 @@ void solve() {
 	for (int i = 1; i <= N; i++) {
 		for (int j = 1; j <= N; j++) {
 			if (tree[i][j].size() == 0) continue;
-			vector<int> temp;
 			int store = 0;
-
+			int cnt = 0;
 			for (int k = 0; k < tree[i][j].size(); k++) {
 				int age = tree[i][j][k];
 				if (map[i][j] >= age) {
 					map[i][j] -= age;
-					temp.push_back(age + 1);
+					tree[i][j][k]++;
 				}
-				else store += age / 2;
+				else {
+					store += age / 2;
+					cnt++;
+				}
 			}
-			tree[i][j].clear();
-			for (int k = 0; k < temp.size(); k++) {
-				tree[i][j].push_back(temp[k]);
+			while (cnt--) {
+				tree[i][j].pop_back();
 			}
 			map[i][j] += store;
 		}
