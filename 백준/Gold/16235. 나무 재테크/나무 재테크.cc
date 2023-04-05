@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-
+#include <deque>
 using namespace std;
 
 const int MAX = 11;
@@ -13,7 +13,7 @@ int K; // 년수
 int A[MAX][MAX]; // 로봇이 뿌리는 양분
 int map[MAX][MAX]; // 땅에 있는 양분
 int ans;
-vector<int> tree[MAX][MAX];
+deque<int> tree[MAX][MAX];
 
 void input() {
 	cin >> N >> M >> K;
@@ -28,6 +28,11 @@ void input() {
 		cin >> a >> b >> c;
 		tree[a][b].push_back(c);
 	}
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			sort(tree[i][j].begin(), tree[i][j].end());
+		}
+	}
 }
 
 void solve() {
@@ -35,7 +40,6 @@ void solve() {
 	for (int i = 1; i <= N; i++) {
 		for (int j = 1; j <= N; j++) {
 			if (tree[i][j].size() == 0) continue;
-			sort(tree[i][j].begin(), tree[i][j].end());
 			vector<int> temp;
 			int store = 0;
 
@@ -66,7 +70,7 @@ void solve() {
 						int nx = j + dx[w];
 
 						if (ny < 1 || nx < 1 || ny >N || nx > N) continue;
-						tree[ny][nx].push_back(1);
+						tree[ny][nx].push_front(1);
 					}
 				}
 			}
