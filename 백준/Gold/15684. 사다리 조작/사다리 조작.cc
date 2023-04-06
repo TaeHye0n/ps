@@ -1,15 +1,13 @@
 #include <iostream>
 #include <vector>
 
-using namespace std;
-
-const int INF = 987654321;
+using namespace std;;
 
 int N; // 세로선의 개수
 int M; // 가로선의 개수
 int H; // 세로선마다 가로선을 놓을 수 있는 위치의 개수
 bool isLinked[11][31]; // row번 세로줄과 row+1 세로줄이 column가로줄로 연결 되었는가?
-int ans = INF;
+int c = 4;
 
 void input() {
 	cin >> N >> M >> H;
@@ -31,26 +29,33 @@ bool ladderGame() {
 	return true;
 }
 
-void recur(int idx, int cnt) {
-	if (cnt >= 4) return;
-	if (ladderGame()) {
-		ans = min(ans, cnt);
+void dfs(int cnt, int maxcnt) {
+	if (c != 4) return;
+	if (maxcnt == cnt) {
+		if (ladderGame()) c = min(c, cnt);
 		return;
 	}
 
-	for (int i = idx; i <= H; i++) {
-		for (int j = 1; j < N; j++) {
-			if (isLinked[j][i] || isLinked[j - 1][i] || isLinked[j + 1][i])continue;
-			isLinked[j][i] = true;
-			recur(i, cnt + 1);
-			isLinked[j][i] = false;
+	for (int i = 1; i < N; i++) {
+		for (int j = 1; j <= H; j++) {
+			if (isLinked[i][j] || isLinked[i - 1][j] || isLinked[i + 1][j]) continue;
+			isLinked[i][j] = true;
+			dfs(cnt + 1, maxcnt);
+			isLinked[i][j] = false;
+			while (!isLinked[i-1][j] && !isLinked[i+1][j]) j++;
 		}
 	}
+	
 }
 void solve() {
-	recur(1, 0);
-	if (ans == INF) cout << -1;
-	else cout << ans;
+	for (int i = 0; i < 4; i++) {
+		dfs(0, i);
+		if (c != 4) {
+			cout << c;
+			break;
+		}
+	}
+	if (c == 4) cout << -1;
 }
 
 int main() {
