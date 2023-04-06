@@ -40,10 +40,7 @@ void recur(int idx, int cnt) {
 
 	for (int i = idx; i <= H; i++) {
 		for (int j = 1; j < N; j++) {
-			if (isLinked[j][i]) continue;
-			if (isLinked[j - 1][i]) continue;
-			if (isLinked[j + 1][i]) continue;
-
+			if (isLinked[j][i] || isLinked[j - 1][i] || isLinked[j + 1][i])continue;
 			isLinked[j][i] = true;
 			recur(i, cnt + 1);
 			isLinked[j][i] = false;
