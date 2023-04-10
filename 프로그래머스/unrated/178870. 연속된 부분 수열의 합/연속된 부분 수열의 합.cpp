@@ -10,7 +10,7 @@ vector<int> solution(vector<int> sequence, int k) {
     int sum = 0;
     int stIdx = 0, edIdx = 0;
     int length = 1000000001;
-    while(ed <= n){
+    while(st < n && ed <= n){
         if(sum >= k){
             sum -= sequence[st++];
         }
