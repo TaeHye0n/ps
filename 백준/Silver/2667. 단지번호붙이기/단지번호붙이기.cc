@@ -1,64 +1,59 @@
 #include<iostream>
 #include<queue>
-#include<stdio.h>
-#include<vector>
 #include<algorithm>
-#pragma warning(disable:4996)
+#include<vector>
+#include<string>
+#include <cstdio>
 using namespace std;
-
-int N, count_;
-int arr[25][25];
-bool vi[25][25];
-int dx[] = { 1, -1, 0, 0 };
-int dy[] = { 0, 0, 1, -1 };
-vector<int> answer;
-
-void solve(int a, int b) {
-	queue<pair<int, int>> q;
-	q.push({ a,b });
-	vi[a][b] = true;
-	count_++;
-
-	while (!q.empty()) {
-		int x = q.front().first;
-		int y = q.front().second;
-		q.pop();
-		for (int w = 0; w < 4; w++) {
-			int nx = x + dx[w];
-			int ny = y + dy[w];
-			if (nx < 0 || nx >= N || ny < 0 || ny >= N) continue;
-			if (vi[nx][ny] == false && arr[nx][ny] == 1) {
-				q.push({ nx, ny });
-				vi[nx][ny] = true;
-				count_++;
+int apart[26][26];
+int dx[] = { 0,0,1,-1 };
+int dy[] = { 1,-1,0,0 };
+int check[26][26];
+queue<pair<int, int>> test;
+vector<int> cnt;
+void sol(int st1, int st2, int N) {
+	int sum = 0;
+	while (!test.empty()) {
+		int x = test.front().first;
+		int y = test.front().second;
+		test.pop();
+		if (check[x][y] == 0 && apart[x][y] == 1) {
+			check[x][y] = 1;
+			sum++;
+			int x1, y1;
+			for (int i = 0; i < 4; i++) {
+				x1 = x + dx[i];
+				y1 = y + dy[i];
+				if (x1 < 0 || y1 < 0 || x1 >= N || y1 >= N)continue;
+				else {
+					test.push(make_pair(x1, y1));
+				}
 			}
-
 		}
-	
 	}
+	if (sum != 0)cnt.push_back(sum);
 }
 
+
+
+
 int main() {
+	int N;
 	cin >> N;
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
-			scanf("%1d", &arr[i][j]);
+			scanf("%1d", &apart[i][j]);
 		}
 	}
+	for (int i = 0; i < N; i++)
+		for (int j = 0; j < N; j++)
+		{
+			test.push(make_pair(i, j));
+			sol(i, j, N);
+		}
 
-	for (int a = 0; a < N; a++) {
-		for (int b = 0; b < N; b++) {
-			if (arr[a][b] == 1 && vi[a][b] == false) {
-				count_ = 0;
-				solve(a, b);
-				answer.push_back(count_);
-			}
-		}
-	}
-	sort(answer.begin(), answer.end());
-	cout << answer.size() << endl;
-	for (int i = 0; i < answer.size(); i++) {
-		cout << answer[i] << endl;
-	}
+	cout << cnt.size() << "\n";
+	sort(cnt.begin(), cnt.end());
+	for (int i = 0; i < cnt.size(); i++)cout << cnt[i] << "\n";
 	return 0;
 }
