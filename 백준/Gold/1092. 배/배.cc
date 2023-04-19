@@ -31,32 +31,17 @@ int main() {
 	}
 
 	int cnt = 0;
-	int realcnt = 0;
-	int idx = M-1;
-	while (1) {
-		bool flag = false;
-		for (int i = N - 1; i >= 0; i--) {
-			for (int j = idx; j >= 0; j--) {
-				if (isCarried[j]) continue;
-				if (crane[i] >= boxes[j]) {
-					cnt++;
-					realcnt++;
-					isCarried[j] = true;
-					idx = j - 1;
-					break;
-				}
-				else flag = true;
+	while (cnt < M) {
+		answer++;
+		int idx = N - 1;
+		for (int i = M - 1; i >= 0; i--) {
+			if (isCarried[i]) continue;
+			if (idx == -1) break;
+			if (boxes[i] <= crane[idx]) {
+				idx--;
+				cnt++;
+				isCarried[i] = true;
 			}
-			if (cnt == N || (flag == true && i == 0)) {
-				answer++;
-				cnt = 0;
-				idx = M - 1;
-				break;
-			}
-		}
-		if (realcnt == M) {
-			if (cnt != N && cnt != 0) answer++;
-			break;
 		}
 	}
 	cout << answer;
