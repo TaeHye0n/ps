@@ -60,7 +60,7 @@ class Solution {
         
         @Override
         public int compareTo(Edge o){
-            return weight - o.weight;
+            return this.weight-o.weight;
         }
     }
 }
