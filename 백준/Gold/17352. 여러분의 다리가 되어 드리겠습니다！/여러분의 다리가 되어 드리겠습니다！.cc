@@ -2,7 +2,6 @@
 using namespace std;
 
 int parent[300001];
-bool visited[300001];
 int find(int x) {
 	if (parent[x] == x) return x;
 	return parent[x] = find(parent[x]);
