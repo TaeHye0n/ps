@@ -14,19 +14,15 @@ int solution(string s)
         }
     }
     
-    for(int i = 0; i < N; i++){
-        for(int j = 0; i+j < N; j++){
-            if(i == 0){
-                ans = 1;
-                break;
-            }
-            if(s[j] == s[j+i] && dp[j+1][i+j-1]){
-                ans = max(ans,i+1);
-                dp[j][i+j] = true;
+    for(int i = N-3; i >=0 ; i--){
+        for(int j = i+2; j< N; j++){
+            if(s[i]==s[j] && dp[i+1][j-1]) {
+                dp[i][j] = true;
+                ans = max(ans,j-i+1);
             }
         }
-    } 
+    }
   
-
+    if(ans==0) return 1;
     return ans;
 }
