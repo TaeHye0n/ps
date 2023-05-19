@@ -34,13 +34,8 @@ class Solution {
             cnt++;
             visited[y][x][d] = true;
             
-            if(grid[y].charAt(x) == 'L'){
-                d = d-1;
-                if(d<0) d = 3;
-            }
-            else if(grid[y].charAt(x) == 'R'){
-               d = (1+d)%4;
-            }
+            if(grid[y].charAt(x) == 'L') d = d -1 < 0 ?  3 : d-1;
+            else if(grid[y].charAt(x) == 'R') d = (d+1)%4;
             
             y = (y + dy[d] + N) % N;
             x = (x + dx[d] + M) % M;
