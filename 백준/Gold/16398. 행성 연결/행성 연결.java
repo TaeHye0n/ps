@@ -37,9 +37,9 @@ public class Main {
         Collections.sort(graph);
         int cnt = 0;
         for(Edge edge: graph) {
-            if(find(edge.from) != find(edge.to)){
+            if(Union(edge.from, edge.to)){
                 answer += edge.cost;
-                Union(edge.from, edge.to);
+                cnt++;
                 if(cnt == N-1) break;
             }
         }
@@ -50,10 +50,11 @@ public class Main {
         return parent[x] = find(parent[x]);
     }
 
-    private static void Union(int x, int y){
+    private static boolean Union(int x, int y){
         x = find(x);
         y = find(y);
-        if(x==y) return;
+        if(x==y) return false;
         parent[y] = x;
+        return true;
     }
 }
