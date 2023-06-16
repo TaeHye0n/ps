@@ -3,29 +3,30 @@ import java.io.*;
 
 public class Main {
     static int N; // 강의의 개수
-    static PriorityQueue<Integer> pq = new PriorityQueue<>();
-    static List<Lecture> list = new ArrayList<>();
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = null;
         N = stoi(br.readLine());
-
+        int[] stArr = new int[N];
+        int[] edArr = new int[N];
+        int answer = 0;
         for(int i = 0; i < N; i++){
             st = new StringTokenizer(br.readLine());
             int num = stoi(st.nextToken());
             int start = stoi(st.nextToken());
             int end = stoi(st.nextToken());
-            list.add(new Lecture(num, start, end));
+            stArr[i] = start;
+            edArr[i] = end;
         }
-        Collections.sort(list);
-
-        int answer = 1;
-        for(int i = 0; i < N; i++){
-            while(!pq.isEmpty() && pq.peek() <= list.get(i).startTime){
-                pq.poll();
+        Arrays.sort(stArr);
+        Arrays.sort(edArr);
+        for(int i = 0, r = 0, sz = 0; i < N; i++){
+            sz++;
+            while(edArr[r] <= stArr[i]){
+                r++;
+                sz--;
             }
-            pq.offer(list.get(i).endTime);
-            answer = Math.max(answer, pq.size());
+            answer = Math.max(answer, sz);
         }
         System.out.println(answer);
     }
@@ -33,21 +34,4 @@ public class Main {
         return Integer.parseInt(s);
     }
 
-    static class Lecture implements Comparable<Lecture>{
-        int num;
-        int startTime;
-        int endTime;
-
-        Lecture(int num, int startTime, int endTime){
-            this.num = num;
-            this.startTime = startTime;
-            this.endTime = endTime;
-        }
-
-        @Override
-        public int compareTo(Lecture o){
-            if(this.startTime == o.startTime) return this.endTime - o.endTime;
-            return this.startTime - o.startTime;
-        }
-    }
 }
