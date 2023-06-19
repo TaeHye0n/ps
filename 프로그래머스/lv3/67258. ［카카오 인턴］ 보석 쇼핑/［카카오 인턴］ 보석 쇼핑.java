@@ -4,32 +4,29 @@ import java.io.*;
 class Solution {
     public int[] solution(String[] gems) {
         int[] answer = new int[2];
-        int size = gems.length;
-        Set<String> set = new HashSet<>();
+        int jewelsCount = (int)Arrays.stream(gems)
+            .distinct()
+            .count();
+        
         Map<String, Integer> map = new HashMap<>();
-        for(String s : gems){
-            set.add(s);
-        }        
-        int left = 0, right = 0;
+        Queue<String> queue = new LinkedList<>();
+        
         int dist = Integer.MAX_VALUE;
-        while(true){
-            if(set.size() == map.size()){
-                map.put(gems[left], map.get(gems[left])-1);
-                if(map.get(gems[left]) == 0) map.remove(gems[left]);
-                left++;
-            }
-            else if(right == size) break;
-            else{
-                map.put(gems[right], map.getOrDefault(gems[right], 0) + 1);
-                right++;
+        int start = 1;
+        for(String gem : gems){
+            map.put(gem, map.getOrDefault(gem, 0) + 1);
+            queue.offer(gem);
+            
+            while(map.get(queue.peek()) > 1){
+                String str = queue.poll();
+                map.put(str, map.get(str) - 1);
+                start++;
             }
             
-            if(map.size() == set.size()){
-                if(right - left < dist){
-                    dist = right - left;
-                    answer[0] = left + 1;
-                    answer[1] = right;
-                }
+            if(map.size() == jewelsCount && dist > queue.size()){
+                dist = queue.size();
+                answer[0] = start;
+                answer[1] = start + dist - 1;
             }
         }
         return answer;
