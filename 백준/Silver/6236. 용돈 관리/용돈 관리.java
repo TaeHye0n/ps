@@ -25,6 +25,10 @@ public class Main {
 
         while (l <= r) {
             int mid = (l + r) / 2;
+            if (calCount(mid) == 0) {
+                l = mid + 1;
+                continue;
+            }
             if (M >= calCount(mid)) {
                 answer = mid;
                 r = mid - 1;
@@ -37,6 +41,7 @@ public class Main {
         int count = 1;
         int money = mid;
         for (int i = 1; i <= N; i++) {
+            if (mid < use[i]) return 0;
             money -= use[i];
             if (money < 0) {
                 count++;
