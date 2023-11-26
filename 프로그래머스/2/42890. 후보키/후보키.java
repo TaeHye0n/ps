@@ -20,16 +20,16 @@ class Solution {
     
     private static void func(int idx, int depth, int bound) {
         if (depth == bound) {
-            String comb = "";
+            StringBuilder comb = new StringBuilder();
             int cnt = 0;
             for (int i = 0; i < relation[0].length; i++) {
                 if (cnt == bound) break;
-                comb += arr[i];
+                comb.append(arr[i]);
                 cnt++;
             }
             // System.out.println(comb);
-            if (check(comb)) {
-                set.add(comb);
+            if (check(comb.toString())) {
+                set.add(comb.toString());
             }
             return;
         }
@@ -63,12 +63,12 @@ class Solution {
         Set<String> rowSet = new HashSet<>();
         // System.out.println(comb);
         for (int i = 0; i < relation.length; i++) {
-            String str = "";
+            StringBuilder sb = new StringBuilder();
             for (int j = 0; j < comb.length(); j++) {
-                str += relation[i][comb.charAt(j) - '0'];
+                sb.append(relation[i][comb.charAt(j) - '0']);
             }
             // System.out.println(str);
-            rowSet.add(str);
+            rowSet.add(sb.toString());
         }
         if (rowSet.size() != relation.length) return false;
         return true;
