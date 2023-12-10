@@ -8,10 +8,6 @@ class Solution {
     public int solution(int x, int y, int n) {
 
         dp = new int[MAX_NUMBER + 1];
-        for (int i = 0; i < dp.length; i++) {
-            dp[i] = -1;
-        }
-        dp[x] = 0;
 
         Queue<Integer> q = new LinkedList<>();
         q.offer(x);
@@ -20,11 +16,12 @@ class Solution {
             int cur = q.poll();
             for (int next : new int[]{cur + n, cur * 2, cur * 3}) {
                 if (next > y) continue;
-                if (dp[next]  != -1) continue;
+                if (dp[next]  != 0) continue;
                 dp[next] = dp[cur] + 1;
                 q.offer(next);
             }
         }
+        if (dp[y] == 0 && y != x) return -1;
         return dp[y];
     }
 }
