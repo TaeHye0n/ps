@@ -19,18 +19,6 @@ void input() {
     }
 }
 
-int binarySearch(int l, int r, int val) {
-    while (l <= r) {
-        int mid = (l + r) / 2;
-        if (val <= dp[mid]) {
-            r = mid - 1;
-        } else {
-            l = mid + 1;
-        }
-    }
-    return l;
-}
-
 int main() {
     FAST_IO;
     input();
@@ -40,8 +28,7 @@ int main() {
         if (dp[len] < line[i]) {
             dp[++len] = line[i];
         } else if (dp[len] > line[i]) {
-            int l = binarySearch(1, len, line[i]);
-            dp[l] = line[i];
+            *lower_bound(dp, dp + len, line[i]) = line[i];
         }
     }
     cout << len;
