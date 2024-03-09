@@ -8,10 +8,11 @@
 #define MAX 500001
 
 using namespace std;
+typedef long long ll;
 
 int n;
-int a[MAX];
-int len;
+ll a[MAX];
+ll len;
 
 void input() {
     cin >> n;
@@ -26,11 +27,14 @@ int main() {
     input();
     sort(a, a + MAX);
 
-    int answer = 0;
-    int idx = 1;
+    ll answer = 0;
+    ll idx = 1;
     while (len > 0) {
         len -= a[idx];
         answer += (a[idx++] * len);
     }
     cout << answer;
+
+    return 0;
 }
+
