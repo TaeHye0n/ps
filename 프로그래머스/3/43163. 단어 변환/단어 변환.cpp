@@ -1,34 +1,42 @@
 #include <string>
 #include <vector>
-#include <climits>
+#include <queue>
 using namespace std;
+
+struct word {
+    string s;
+    int depth;
+};
 bool visited[51];
-int answer = INT_MAX;
-
-
-void dfs(string cur, string target, int count, vector<string> words) {
-    if (target == cur) {
-        answer = min(answer, count);
-        return;
-    }
+int solution(string begin, string target, vector<string> words) {
+    int answer = 0;
     
-    for (int i = 0; i < words.size(); i++) {
-        int charCount = 0;
-        for (int j = 0; j < words[i].size(); j++) {
-            if (words[i][j] != cur[j]) charCount++;
-            if (charCount >= 2) break;
+    queue<word> q;
+    q.push({begin, 0});
+    
+    while(!q.empty()) {
+        word cur = q.front();
+        q.pop();
+        
+        if (cur.s == target) {
+            return cur.depth;
         }
-        if (charCount == 1) {
-            if (!visited[i]) {
-                 visited[i] = true;
-                 dfs(words[i], target, count + 1, words);
-                 visited[i] = false;
+        
+        for (int i = 0; i < words.size(); i++) {
+            if (visited[i]) continue;
+            int count = 0;
+            for (int j = 0; j < words[i].size(); j++) {
+                if (cur.s[j] != words[i][j]) count++;
+                if (count >= 2) break;
+            }
+            
+            if (count == 1) {
+                if (!visited[i]) {
+                    visited[i] = true;
+                    q.push({words[i], cur.depth + 1});
+                }
             }
         }
     }
-}
-int solution(string begin, string target, vector<string> words) {
-    
-    dfs(begin, target, 0, words);
-    return answer == INT_MAX ? 0 : answer;
+    return answer;
 }
