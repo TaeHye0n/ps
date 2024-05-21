@@ -11,7 +11,7 @@ ll solution(int n, vector<int> times) {
     sort(times.begin(), times.end());
     
     ll l = 1;
-    ll r = (ll) times.back() * n;
+    ll r = (ll) times.back() * n / times.size();
     
     while (l <= r) {
         ll mid = (l + r) / 2;
