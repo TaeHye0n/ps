@@ -62,16 +62,16 @@ vector<int> solution(vector<vector<int>> dice) {
         
         int cnt = 0;
         for (int sum : sumA) {
-            int st = 0;
+            int st = -1;
             int ed = sumB.size();
             
             while (st + 1 < ed) {
                 int mid = (st + ed) / 2;
                 
-                if (sum > sumB[mid]) st = mid;
+                if (sumB[mid] < sum) st = mid;
                 else ed = mid;
             }
-            cnt += st;
+            cnt += ed;
         }
         
         if (cnt > maxCnt) {
