@@ -72,6 +72,8 @@ vector<int> solution(vector<vector<int>> dice) {
                 else ed = mid;
             }
             cnt += ed;
+            
+            // int idx = lower_bound(sumB.begin(), sumB.end(), sum) - sumB.begin();
         }
         
         if (cnt > maxCnt) {
