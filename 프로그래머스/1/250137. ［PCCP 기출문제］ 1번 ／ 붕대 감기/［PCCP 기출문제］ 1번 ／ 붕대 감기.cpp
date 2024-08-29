@@ -17,7 +17,6 @@ int solution(vector<int> bandage, int health, vector<vector<int>> attacks) {
         lastAtkTime = time;
         
         int heal = (tempo - 1) * bandage[1] + ((tempo - 1)/ bandage[0]) * bandage[2];
-        cout << tempo << endl;
         
         curHealth = curHealth + heal > health ? health : curHealth + heal;
         
