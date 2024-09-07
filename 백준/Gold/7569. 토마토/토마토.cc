@@ -1,67 +1,105 @@
-#include<iostream>
-#include<queue>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cstring>
+#include <algorithm>
+#include <climits>
+#include <queue>
 
+#define FAST_IO ios_base::sync_with_stdio(false); cin.tie(nullptr); cout.tie(nullptr)
+#define endl "\n"
+#define Y first
+#define X second
 using namespace std;
-// [면][행][열] = [z][y][x]
-int vi[101][101][101];
-int arr[101][101][101]; 
-queue < pair<pair<int, int>, int>> q;
-int N, M, H,ans;
-int dx[] = { 1,-1,0,0,0,0 };
-int dy[] = { 0,0,1,-1,0,0 };
-int dz[] = { 0,0,0,0,1,-1 };
+typedef long long ll;
 
-void solve() {
-	for (int i = 0; i < H; i++) {
-		for (int j = 0; j < N; j++) {
-			for (int k = 0; k < M; k++) {
-				cin >> arr[i][j][k];
-				vi[i][j][k] = -1;
-				if (arr[i][j][k] == 1 && vi[i][j][k] == -1) {
-					q.push({ {i,j},k });
-					vi[i][j][k] = 0;
-				}
-			}
-		}
-	}
+int dy[6] = { 1, -1, 0, 0, 0, 0 };
+int dx[6] = { 0, 0, 1, -1, 0,0 };
+int dz[6] = { 0, 0, 0, 0, 1, -1 };
 
-	while (!q.empty()) {
-		int z = q.front().first.first;
-		int y = q.front().first.second;
-		int x = q.front().second;
-		q.pop();
+int n, m, h; // 세로 가로 높이
+int board[101][101][101]; // h, n, m
+bool visited[101][101][101];
 
-		for (int w = 0; w < 6; w++) {
-			int nz = z + dz[w];
-			int ny = y + dy[w];
-			int nx = x + dx[w];
-			if (nx < 0 || nx >= M || ny < 0 || ny >= N || nz < 0 || nz >= H) continue;
-			if (arr[nz][ny][nx] == 0 && vi[nz][ny][nx] == -1) {
-				q.push({ {nz,ny},nx });
-				vi[nz][ny][nx] = vi[z][y][x] + 1;
-			}
-		}
-	}
-	for (int i = 0; i < H; i++) {
-		for (int j = 0; j < N; j++) {
-			for (int k = 0; k < M; k++) {
-				ans = max(ans, vi[i][j][k]);
-			}
-		}
-	}
-	for (int i = 0; i < H; i++) {
-		for (int j = 0; j < N; j++) {
-			for (int k = 0; k < M; k++) {
-				if (arr[i][j][k] == 0 && vi[i][j][k] == -1) ans = -1;
-			}
-		}
-	}
-}
-
+struct pos {
+    int z;
+    int y;
+    int x;
+};
 
 int main() {
-	cin >> M >> N >> H;
-	solve();
-	cout << ans << endl;
-	return 0;
+    FAST_IO;
+    
+    cin >> m >> n >> h;
+    vector<pos> v;
+    
+    bool flag = true;
+
+    for (int i = 0; i < h; i++) {
+        for (int j = 0; j < n; j++) {
+            for (int k = 0; k < m; k++) {
+                cin >> board[i][j][k];
+                if (board[i][j][k] == 1) {
+                    v.push_back({ i, j, k });
+                }
+                else if (board[i][j][k] == 0) {
+                    flag = false;
+                }
+            }
+        }
+    }
+
+    if (flag) {
+        cout << 0;
+        return 0;
+    }
+
+    int ans = -1;
+    while (!v.empty()) {
+        ans++;
+        queue<pos> q;
+        vector<pos> v2;
+        for (auto p : v) {
+            q.push(p);
+        }
+
+        while (!q.empty()) {
+            int cz = q.front().z;
+            int cy = q.front().y;
+            int cx = q.front().x;
+            q.pop();
+
+            for (int w = 0; w < 6; w++) {
+                int nz = cz + dz[w];
+                int ny = cy + dy[w];
+                int nx = cx + dx[w];
+
+                if (nz < 0 || ny < 0 || nx < 0 || nz >= h || ny >= n || nx >= m) continue;
+
+                if (visited[nz][ny][nx] || board[nz][ny][nx] != 0) continue;
+
+                v2.push_back({ nz, ny, nx });
+                visited[nz][ny][nx] = true;
+                board[nz][ny][nx] = 1;
+            }
+        }
+
+        v = v2;
+
+    }
+    
+    for (int i = 0; i < h; i++) {
+        for (int j = 0; j < n; j++) {
+            for (int k = 0; k < m; k++) {
+                if (board[i][j][k] == 0) {
+                    cout << -1;
+                    return 0;
+                }
+            }
+        }
+    }
+
+    cout << ans;
+
+    return 0;
 }
