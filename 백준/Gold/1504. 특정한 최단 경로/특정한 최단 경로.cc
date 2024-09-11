@@ -1,73 +1,87 @@
 #include <iostream>
-#include <queue>
+#include <string>
+#include <vector>
+#include <cstring>
 #include <algorithm>
+#include <climits>
+#include <queue>
+
+#define FAST_IO ios_base::sync_with_stdio(false); cin.tie(nullptr); cout.tie(nullptr)
+#define endl "\n"
+#define Y first
+#define X second
 
 #define MAX 801
-#define INF 987654321
 using namespace std;
+typedef long long ll;
 
-int N, E;
-vector<pair<int, int>> graph[MAX];
-int dist[MAX];
-int V1, V2;
+const ll INF = 1e9 + 10;
+int N, E; // 정점의 개수, 간선의 개수
+vector<pair<int, ll>> adj[MAX];
+ll dist[MAX];
+
 void dijkstra(int start) {
-	for (int i = 1; i <= N; i++) {
-		dist[i] = INF;
-	}
+    fill(dist, dist + N + 1, INF);
+    dist[start] = 0;
+    priority_queue < pair <ll, int > , vector<pair<ll, int>>, greater<pair<ll, int>> > pq;
+    pq.push({ 0, start });
+    
+    while (!pq.empty()) {
+        ll cur_dist = pq.top().Y;
+        int cur_node = pq.top().X;
+        pq.pop();
 
-	priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-	dist[start] = 0;
-	pq.push({ 0,start });
-	
-	while (!pq.empty()) {
-		int curDist = pq.top().first;
-		int cur = pq.top().second;
-		pq.pop();
+        if (cur_dist != dist[cur_node]) continue;
 
-		if (curDist > dist[cur]) continue;
-
-		for (int i = 0; i < graph[cur].size(); i++) {
-			int next = graph[cur][i].first;
-			int nDist = graph[cur][i].second;
-			if (dist[next] > curDist + nDist) {
-				dist[next] = curDist + nDist;
-				pq.push({ curDist + nDist, next });
-			}
-		}
-	}
+        for (auto &nxt : adj[cur_node]) {
+            ll nxt_dist = nxt.X;
+            int nxt_node = nxt.Y;
+            if (dist[nxt_node] <= dist[cur_node] + nxt_dist) continue;
+            dist[nxt_node] = dist[cur_node] + nxt_dist;
+            pq.push({ dist[nxt_node], nxt_node });
+        }
+    }
 }
+
 int main() {
-	ios_base::sync_with_stdio(0);
-	cin.tie(0); cout.tie(0);
+    FAST_IO;
+    
+    cin >> N >> E;
+    
+    for (int i = 0; i < E; i++) {
+        ll from = 0, to = 0, cost = 0;
+        cin >> from >> to >> cost;
+        // 간선은 양방향
+        adj[from].push_back({ to, cost });
+        adj[to].push_back({ from, cost });
+    }
 
-	cin >> N >> E;
-	for (int i = 0; i < E; i++) {
-		int a, b, c;
-		cin >> a >> b >> c;
-		graph[a].push_back({ b,c });
-		graph[b].push_back({ a,c });
-	}
-	cin >> V1 >> V2;
+    int v1 = 0, v2 = 0;
+    cin >> v1 >> v2;
 
-	int stToV1 = 0, stToV2 = 0;
-	int v1ToV2 = 0;
-	int v1ToN = 0, v2ToN = 0;
-	
-	dijkstra(1);
-	stToV1 = dist[V1];
-	stToV2 = dist[V2];
+    // 이동했던 간선도 다시 이동할 수 있다. 
+    // 정점 사이에는 간선이 최대 1개 존재
+    // 반드시 시작 -> v1 & v2 -> 끝을 거친 최단 거리 계산 해야한다.
+    
+    // 1. 1번 정점과 v1 or v2 정점 사이 거리 계산
+    dijkstra(1);
+    ll start_to_v1 = dist[v1];
+    ll start_to_v2 = dist[v2];
 
-	dijkstra(V1);
-	v1ToV2 = dist[V2];
-	v1ToN = dist[N];
+    // 2. v1 정점과 v2, N번 정점 사이의 거리 계산
+    dijkstra(v1);
+    ll v1_to_v2 = dist[v2];
+    ll v1_to_end = dist[N];
 
-	dijkstra(V2);
-	v2ToN = dist[N];
+    // 3. v2 정점과 N번 정점 사이의 거리 계산
+    dijkstra(v2);
+    ll v2_to_end = dist[N];
 
-	int ans = INF;
-	ans = min(ans, stToV1 + v1ToV2 + v2ToN);
-	ans = min(ans, stToV2 + v1ToV2 + v1ToN);
-	if (ans == INF || v1ToV2 == INF) cout << -1;
-	else cout << ans;
-	return 0;
+    ll ans = INF;
+    ans = min(ans, start_to_v1 + v1_to_v2 + v2_to_end); // start -> v1 -> v2 -> end
+    ans = min(ans, start_to_v2 + v1_to_v2 + v1_to_end); // start -> v2 -> v1 -> end
+    if (ans == INF) cout << -1;
+    else cout << ans;
+
+    return 0;
 }
