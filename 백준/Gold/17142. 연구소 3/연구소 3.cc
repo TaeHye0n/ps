@@ -1,108 +1,106 @@
-#include<iostream>
+#include <iostream>
 #include <vector>
-#include <queue>
+#include <string>
+#include <algorithm>
 #include <cstring>
-#include<climits>
+#include <queue>
+#include <climits>
+
+#define FAST_IO ios_base::sync_with_stdio(false); cin.tie(nullptr); cout.tie(nullptr)
+#define first Y
+#define second X
+#define endl "\n"
+
+#define MAX 51
 using namespace std;
+typedef long long ll;
 
-int N, M;
-int map[51][51];
-int copyMap[51][51];
-int vi[51][51];
-int answer = INT_MAX;
+const int dy[4] = {1, -1, 0, 0};
+const int dx[4] = {0, 0, 1, -1};
 
-int dy[4] = { 1,-1,0,0 };
-int dx[4] = { 0,0,1,-1 };
-vector<pair <int, int>> v, temp;
-vector<int> t;
 struct virus {
-	int y, x;
+    int y;
+    int x;
 };
+vector<virus> v, comb;
+int N; // 연구소의 크기 4 <= N <= 50
+int M; // 놓을 수 있는 바이러스의 개수 1 <= M <= 10
+int lab[MAX][MAX];
+int visited[MAX][MAX];
+int ans = INT_MAX;
 
-void input() {
-	cin >> N >> M;
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			cin >> map[i][j];
-			if (map[i][j] == 2) v.push_back({ i,j });
-		}
-	}
-}
-void copy(int a[51][51], int b[51][51]) {
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			a[i][j] = b[i][j];
-		}
-	}
-}
 void bfs() {
-	int final[51][51];
-	copy(final, map);
-	queue<virus> q;
+    memset(visited, -1, sizeof(visited));
+    queue<virus> q;
 
-	for (int i = 0; i < temp.size(); i++) {
-		q.push({ temp[i].first, temp[i].second });
-		vi[temp[i].first][temp[i].second] = 0;
-	}
-	
-	while (!q.empty()) {
+    for (auto e: comb) {
+        q.push(e);
+        visited[e.y][e.x] = 0;
+    }
 
-		
-		int y = q.front().y;
-		int x = q.front().x;
-		q.pop();
+    while (!q.empty()) {
+        int cy = q.front().y;
+        int cx = q.front().x;
+        q.pop();
 
-		for (int w = 0; w < 4; w++) {
-			int ny = y + dy[w];
-			int nx = x + dx[w];
-			if (ny < 0 || nx < 0 || ny >= N || nx >= N) continue;
-			if (final[ny][nx] != 1 && vi[ny][nx] ==-1) {
-				q.push({ ny,nx });
-				vi[ny][nx] = vi[y][x] + 1;
-			}
-		}
-	}
+        for (int w = 0; w < 4; w++) {
+            int ny = cy + dy[w];
+            int nx = cx + dx[w];
 
-	int time = 0;
-	bool flag = true;
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			if (map[i][j] == 0) {
-				if (vi[i][j] == -1) {
-					flag = false;
-					break;
-				}
-				else
-					time = max(time, vi[i][j]);
-			}
-		}
-	}
-	if (flag) answer = min(answer, time);
+            if (ny < 0 || nx < 0 || ny >= N || nx >= N) continue;
+
+            if (visited[ny][nx] != -1 || lab[ny][nx] == 1) continue;
+
+            visited[ny][nx] = visited[cy][cx] + 1;
+            q.push({ny, nx});
+        }
+    }
+
+    bool all_spread = true;
+    int spread_time = 0;
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            if (lab[i][j] == 0) {
+                if (visited[i][j] == -1) {
+                    all_spread = false;
+                    break;
+                }
+                spread_time = max(spread_time, visited[i][j]);
+            }
+        }
+    }
+
+    if (all_spread) ans = min(ans, spread_time);
 }
 
-void comb(int idx, int cnt) {
-	if (cnt == M) {
-		memset(vi, -1, sizeof(vi));
-		bfs();
-		return;
-	}
+void make_comb(int idx, int cnt) {
+    if (cnt == M) {
+        bfs();
+        return;
+    }
 
-	for (int i = idx; i < v.size(); i++) {
-		temp.push_back(v[i]);
-		comb(i + 1, cnt + 1);
-		temp.pop_back();
-	}
+    for (int i = idx; i < v.size(); i++) {
+        comb.push_back(v[i]);
+        make_comb(i + 1, cnt + 1);
+        comb.pop_back();
+    }
 }
-
-
 
 int main() {
-	input();
-	comb(0, 0);
+    FAST_IO;
 
-	if(answer == INT_MAX)
-		cout << -1;
-	else
-	cout << answer;
-	return 0;
+    cin >> N >> M;
+
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            cin >> lab[i][j];
+            if (lab[i][j] == 2) v.push_back({i, j});
+        }
+    }
+
+    make_comb(0, 0);
+    if (ans == INT_MAX) cout << -1;
+    else cout << ans;
+    return 0;
 }
+
