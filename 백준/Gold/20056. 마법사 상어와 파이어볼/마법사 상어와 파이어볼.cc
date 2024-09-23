@@ -1,119 +1,113 @@
 #include <iostream>
+#include <string>
 #include <vector>
+#include <cstring>
+#include <algorithm>
+#include <climits>
+#include <queue>
 
-using namespace std;
+#define FAST_IO ios_base::sync_with_stdio(false); cin.tie(nullptr); cout.tie(nullptr)
+#define endl "\n"
+#define Y first
+#define X second
 
-#define FAST_IO ios_base::sync_with_stdio(false); cin.tie(nullptr); cout.tie(nullptr);
 #define MAX 51
+using namespace std;
+typedef long long ll;
 
-const int dy[8] = {-1, -1, 0, 1, 1, 1, 0, -1};
-const int dx[8] = {0, 1, 1, 1, 0, -1, -1 ,-1};
+const int dy[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
+const int dx[8] = { 0, 1, 1 ,1 ,0, -1, -1, -1 };
 
-int N, M, K;
-
-struct fireBall {
-    int r;
-    int c;
-    int m;
-    int s;
-    int d;
+struct fireball {
+	int r;
+	int c;
+	int m;
+	int d;
+	int s;
 };
 
-vector<fireBall> fireBalls;
-vector<fireBall> board[MAX][MAX];
-
-bool isAllSameDir(int y, int x);
-
-void move() {
-    for (int i = 1; i <= N; i++) {
-        for (int j = 1; j <= N; j++) {
-            board[i][j].clear();
-        }
-    }
-    
-    for (int i = 0; i < fireBalls.size(); i++) {
-        fireBall &cur = fireBalls[i];
-        int cy = cur.r;
-        int cx = cur.c;
-        int speed = cur.s % N;
-        
-        int ny = cy + speed * dy[cur.d];
-        int nx = cx + speed * dx[cur.d];
-        
-        if (ny > N) ny -= N;
-        if (nx > N) nx -= N;
-        if (nx < 1) nx += N;
-        if (ny < 1) ny += N;
-        cur.r = ny;
-        cur.c = nx;
-        board[ny][nx].push_back({ny, nx, cur.m, cur.s, cur.d});
-    }
-}
-
-void sumAndSplit() {
-    vector<fireBall> temp;
-    
-    for (int i = 1; i <= N; i++) {
-        for (int j = 1; j <= N; j++) {
-            if (board[i][j].size() == 0) continue;
-            if (board[i][j].size() == 1) temp.push_back(board[i][j][0]);
-            else {
-                int massSum = 0, speedSum = 0;
-                int size = board[i][j].size();
-                for (int k = 0; k < size; k++) {
-                    massSum += board[i][j][k].m;
-                    speedSum += board[i][j][k].s;
-                }
-                int mass = massSum / 5;
-                if (mass == 0) continue;
-                int speed = speedSum / size;
-                int start = 0;
-                if (!isAllSameDir(i, j)) start = 1;
-                for (int k = 0; k <= 7; k += 2) {
-                    temp.push_back({i, j, mass, speed, start + k});
-                }
-            }
-        }
-    }
-    fireBalls = temp;
-}
-
-bool isAllSameDir(int y, int x) {
-    bool isOdd = true;
-    bool isEven = true;
-    
-    for (int i = 0; i < board[y][x].size(); i++) {
-        fireBall cur = board[y][x][i];
-        if (cur.d % 2 == 0) isOdd = false;
-        else isEven = false;
-    }
-    
-    if (isOdd || isEven) return true;
-    return false;
-}
-
-
-
+vector<fireball> board[MAX][MAX];
+vector<fireball> fireballs;
+int N, M, K; // 격자 크기 N, 파이어볼 M개, K번 명령
 int main() {
-    FAST_IO;
-    
-    cin >> N >> M >> K;
-    for (int i = 0; i < M; i++) {
-        int a, b, c, d, e;
-        cin >> a >> b >> c >> d >> e;
-        fireBalls.push_back({a, b, c, d, e});
-    }
-    
-    for (int t = 0; t < K; t++) {
-        // 1. 이동
-        move();
-        // 2. 합쳐지고 나누어짐
-        sumAndSplit();
-    }
-    int answer = 0;
-    
-    for (int i = 0; i < fireBalls.size(); i++) {
-        answer += fireBalls[i].m;
-    }
-    cout << answer;
+	FAST_IO;
+
+	cin >> N >> M >> K;
+
+	queue<fireball> q;
+
+	for (int i = 0; i < M; i++) {
+		int r, c, m, s, d;
+		cin >> r >> c >> m >> s >> d;
+		fireballs.push_back({ r, c, m, d, s });
+	}
+
+	while (K--) {
+		for (int i = 1; i <= N; i++) {
+			for (int j = 1; j <= N; j++) {
+				board[i][j].clear();
+			}
+		}
+
+		vector<fireball> temp;
+		// 1. 이동
+		for (auto &f : fireballs) {
+			int speed = f.s % N;
+
+			// 격자 외곽들이 연결 되어있음
+			int ny = (f.r + dy[f.d] * speed - 1 + N) % N + 1;  
+			int nx = (f.c + dx[f.d] * speed - 1 + N) % N + 1; 
+			f.r = ny;
+			f.c = nx;
+			board[ny][nx].push_back(f);
+		}
+
+		// 2. 2개 이상 파이어볼 있는 칸 로직
+		for (int i = 1; i <= N; i++) {
+			for (int j = 1; j <= N; j++) {
+				if (board[i][j].size() == 1) {
+					temp.push_back(board[i][j][0]);
+				} 
+				else if (board[i][j].size() >= 2) {
+					bool all_even = true, all_odd = true;
+					int mass_sum = 0;
+					int speed_sum = 0;
+					int cnt = board[i][j].size();
+
+					for (auto& f : board[i][j]) {
+						mass_sum += f.m;
+						speed_sum += f.s;
+
+						if (f.d % 2 == 0) all_odd = false;
+						else all_even = false;
+					}
+
+					int new_mass = mass_sum / 5;
+					int new_speed = speed_sum / cnt;
+
+					if (new_mass == 0) continue;
+
+					if (all_even || all_odd) {
+						for (int w = 0; w < 8; w += 2) {
+							temp.push_back({ i, j, new_mass, w, new_speed });
+						}
+					}
+					else {
+						for (int w = 1; w < 8; w += 2) {
+							temp.push_back({ i, j, new_mass, w, new_speed });
+						}
+					}
+				}
+			}
+		}
+		fireballs = temp;
+	}
+
+	int ans = 0;
+	for (auto& f : fireballs) {
+		ans += f.m;
+	}
+	
+	cout << ans;
+	return 0;
 }
