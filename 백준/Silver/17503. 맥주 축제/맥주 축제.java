@@ -50,9 +50,10 @@ public class Main {
             List<Integer> candidates = new ArrayList<>();
             for (int i = 0; i < K; i++) {
                 Beer cur = list.get(i);
-                if (cur.deg <= mid) {
-                    candidates.add(cur.favor);
+                if (cur.deg > mid) {
+                    break;
                 }
+                candidates.add(cur.favor);
             }
 
             if (candidates.size() >= N) {
