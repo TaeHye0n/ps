@@ -18,7 +18,9 @@ public class Main {
 
         @Override
         public int compareTo(Beer o) {
-            if (this.deg == o.deg) return o.favor - this.favor;
+            if (this.deg == o.deg) {
+                return o.favor - this.favor;
+            }
             return this.deg - o.deg;
         }
 
@@ -34,52 +36,37 @@ public class Main {
         long ans = Long.MAX_VALUE;
         List<Beer> list = new ArrayList<>();
 
-        long l = 0, r = 0;
         for (int i = 0; i < K; i++) {
             st = new StringTokenizer(br.readLine());
             int favor = stoi(st.nextToken());
             int deg = stoi(st.nextToken());
-            r = Math.max(deg, r);
             list.add(new Beer(deg, favor));
         }
 
         Collections.sort(list);
 
-        while (l <= r) {
-            long mid = (l + r) / 2;
-            List<Integer> candidates = new ArrayList<>();
-            for (int i = 0; i < K; i++) {
-                Beer cur = list.get(i);
-                if (cur.deg > mid) {
-                    break;
-                }
-                candidates.add(cur.favor);
+        PriorityQueue<Integer> pq = new PriorityQueue<>();
+
+        long sum = 0L;
+        for (int i = 0; i < K; i++) {
+            pq.offer(list.get(i).favor);
+            sum += list.get(i).favor;
+
+            if (pq.size() > N) {
+                sum -= pq.poll();
             }
 
-            if (candidates.size() >= N) {
-                Collections.sort(candidates, Collections.reverseOrder());
-                long sum = 0;
-                for (int i = 0; i < N; i++) {
-                    sum += candidates.get(i);
-                }
-
-                if (sum >= M) {
-                    ans = Math.min(ans, mid);
-                    r = mid - 1;
-                } else {
-                    l = mid + 1;
-                }
-            } else {
-                l = mid + 1;
+            if (pq.size() == N && sum >= M) {
+                ans = list.get(i).deg;
+                break;
             }
         }
 
-        if (ans == Long.MAX_VALUE)
+        if (ans == Long.MAX_VALUE) {
             System.out.println(-1);
-        else {
+        } else {
             System.out.println(ans);
         }
-
     }
 
     static int stoi(String s) {
