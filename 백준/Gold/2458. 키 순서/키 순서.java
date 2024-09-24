@@ -6,8 +6,7 @@ public class Main {
   static int N; // 학생들의 수 2 <= N <= 500
   static int M; // 학생 키를 비교한 횟수 0 <= M <= N(N-1) / 2
   static int ans;
-  static boolean[] visited;
-  static int cnt;
+  static final int INF = 987654321;
 
   public static void main(String[] args) throws Exception {
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -15,47 +14,50 @@ public class Main {
     N = stoi(st.nextToken());
     M = stoi(st.nextToken());
     ans = 0;
-    List<Integer>[] graph = new List[N + 1];
-    List<Integer>[] reverseGraph = new List[N + 1];
-    visited = new boolean[N + 1];
-    for (int i = 0; i <= N; i++) {
-      graph[i] = new ArrayList<>();
-      reverseGraph[i] = new ArrayList<>();
+
+    int[][] adj = new int[N + 1][N + 1];
+
+    for (int i = 1; i <= N; i++) {
+      for (int j = 1; j <= N; j++) {
+        if (i == j) {
+          continue;
+        }
+        adj[i][j] = INF;
+      }
     }
 
     for (int i = 1; i <= M; i++) {
       st = new StringTokenizer(br.readLine());
       int from = stoi(st.nextToken());
       int to = stoi(st.nextToken());
-      graph[from].add(to);
-      reverseGraph[to].add(from);
+      adj[from][to] = 1;
+    }
+
+    for (int k = 1; k <= N; k++) {
+      for (int i = 1; i <= N; i++) {
+        for (int j = 1; j <= N; j++) {
+          adj[i][j] = Math.min(adj[i][j], adj[i][k] + adj[k][j]);
+        }
+      }
     }
 
     for (int i = 1; i <= N; i++) {
-      cnt = 0;
-      Arrays.fill(visited, false);
-      dfs(i, graph);
-      Arrays.fill(visited, false);
-      dfs(i, reverseGraph);
+      int cnt = 0;
+      for (int j = 1; j <= N; j++) {
+        if (i == j) {
+          continue;
+        }
+        if (adj[i][j] != INF || adj[j][i] != INF) {
+          cnt++;
+        }
+      }
+
       if (cnt == N - 1) {
         ans++;
       }
     }
-
     System.out.println(ans);
 
-  }
-
-  static void dfs(int idx, List<Integer>[] list) {
-    for (int i = 0; i < list[idx].size(); i++) {
-      int next = list[idx].get(i);
-      if (visited[next]) {
-        continue;
-      }
-      visited[next] = true;
-      cnt++;
-      dfs(next, list);
-    }
   }
 
   static int stoi(String s) {
