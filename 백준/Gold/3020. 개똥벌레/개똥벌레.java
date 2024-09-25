@@ -5,53 +5,48 @@ public class Main {
 
     static int N; // 동굴의 길이 2 <= N <= 200,000
     static int H; // 동굴의 높이 2 <= H <= 500,000
-    static List<Integer> low = new ArrayList<>();
-    static List<Integer> high = new ArrayList<>();
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
         N = stoi(st.nextToken());
         H = stoi(st.nextToken());
-
+        int[] low = new int[H + 1];
+        int[] high = new int[H + 1];
         for (int i = 1; i <= N; i++) {
+            int a = stoi(br.readLine());
             if (i % 2 == 0) {
-                high.add(stoi(br.readLine()));
+                high[H- a + 1]++;
             } else {
-                low.add(stoi(br.readLine()));
+                low[a]++;
             }
         }
 
-        Collections.sort(high);
-        Collections.sort(low);
-        int ans = Integer.MAX_VALUE;
-        int ansCnt = 0;
+        for (int i = 1; i < H; i++) {
+            high[i + 1] += high[i];
+        }
+
+        for (int i = H - 1; i > 1; i--) {
+            low[i - 1] += low[i];
+        }
+
+        int[] sum = new int[H + 1];
         for (int i = 1; i <= H; i++) {
-            int cnt = lowerBound(i, low);
-            cnt += lowerBound(H - i + 1 , high);
-
-            cnt = N - cnt;
-
-            if (ans == cnt) {
-                ansCnt++;
-            } else if(ans > cnt) {
-                ans = cnt;
-                ansCnt = 1;
-            }
+            sum[i] = low[i] + high[i];
         }
 
-        System.out.print(ans + " " + ansCnt);
-    }
+        Arrays.sort(sum);
 
-    static int lowerBound(int target, List<Integer> list) {
-        int l = 0, r = list.size();
-
-        while (l < r) {
-            int mid = (l + r) / 2;
-            if (list.get(mid) >= target) r = mid;
-            else l = mid + 1;
+        int cnt = 1;
+        int val = sum[1];
+        for (int i = 2; i <= H; i++) {
+            if (sum[i] == val) {
+                cnt++;
+            } else break;
         }
-        return l;
+
+        System.out.println(val + " " + cnt);
+
     }
 
     static int stoi(String s) {
