@@ -5,86 +5,93 @@
 
 using namespace std;
 
+// 1. 주사위 고르는 경우의수 구하기 o(252)개
+// 2. 경우의 수 마다 승패 계산 -> 6^n개 방식으로 풀면 시간초과 -> 나올 수 있는 합들을 구한 후 한쪽 기준 이분탐색
+
 int n;
 vector<vector<int>> dices;
-vector<vector<int>> diceComb;
-vector<int> sumA;
-vector<int> sumB;
-// 주사위 고르기 nC(n/2)
-// 중복X 조합
-void makeComb(int st, vector<int> cur) {
-    if (cur.size() == n / 2) {
-        diceComb.push_back(cur);
+vector<vector<int>> comb;
+vector<int> sumA, sumB;
+
+void make_comb(int idx, vector<int> com) {
+    if (com.size() == n / 2) {
+        comb.push_back(com);
         return;
     }
     
-    for (int i = st; i < n; i++) {
-        cur.push_back(i);
-        makeComb(i + 1, cur);
-        cur.pop_back();
+    for (int i = idx; i < n; i++) {
+        com.push_back(i);
+        make_comb(i + 1, com);
+        com.pop_back();
     }
 }
 
-void calSum(int idx, int sum, bool isA, vector<int> selectedDices) {
+void cal_sum(int idx, int sum, bool isA, vector<int> dice) {
     if (idx == n / 2) {
-        isA ? sumA.push_back(sum) : sumB.push_back(sum);
+        if (isA) {
+            sumA.push_back(sum);
+        } else {
+            sumB.push_back(sum);
+        }
         return;
     }
     
     for (int i = 0; i < 6; i++) {
-        calSum(idx + 1, sum + dices[selectedDices[idx]][i], isA, selectedDices);
+        cal_sum(idx + 1, sum + dices[dice[idx]][i], isA, dice);
     }
+}
+
+int lower_bound(int target) {
+    int l = 0;
+    int r = sumB.size();
+    while (l < r) {
+        int mid = (l + r) / 2;
+        if (sumB[mid] >= target) r = mid;
+        else l = mid + 1;
+    }
+    
+    return l;
 }
 vector<int> solution(vector<vector<int>> dice) {
     dices = dice;
     n = dice.size();
     vector<int> answer(n / 2);
     vector<int> v;
-    makeComb(0, v);
+    make_comb(0, v);
+    int max_cnt = 0;
     
-    int maxCnt = 0;
-    for (auto diceA : diceComb) {
+    for (int i = 0; i < comb.size(); i++) {
         sumA.clear(); sumB.clear();
+        vector<int> diceA = comb[i];
         vector<int> diceB;
-        
-        for (int i = 0; i < n; i++) {
-            bool flag = false;
-            for (auto idx : diceA) {
-                if (i == idx) flag = true;
-            }
-            
-            if (flag) continue;
-            diceB.push_back(i);
-        }
-        calSum(0, 0, true, diceA);
-        calSum(0, 0, false, diceB);
-        sort(sumB.begin(), sumB.end());
-        
-        int cnt = 0;
-        for (int sum : sumA) {
-            int st = -1;
-            int ed = sumB.size();
-            
-            while (st + 1 < ed) {
-                int mid = (st + ed) / 2;
-                
-                if (sumB[mid] < sum) st = mid;
-                else ed = mid;
-            }
-            cnt += ed;
-            
-            // int idx = lower_bound(sumB.begin(), sumB.end(), sum) - sumB.begin();
-        }
-        
-        if (cnt > maxCnt) {
-            maxCnt = cnt;
-            
-            for (int i = 0; i < diceA.size(); i++) {
-                answer[i] = diceA[i] + 1;
-            }
-        }
-    }
 
-    
+        for (int j = 0; j < n; j++) {
+            bool isA = false;
+            for (int k = 0; k < diceA.size(); k++) {
+                if (j == diceA[k]) {
+                    isA = true;
+                    break;
+                }
+            }
+            if (!isA) diceB.push_back(j);
+        }
+        
+        cal_sum(0, 0, true, diceA);
+        cal_sum(0, 0, false, diceB);
+        
+        sort(sumB.begin(), sumB.end());
+        int cnt = 0;
+        for (auto sum : sumA) {
+            cnt += lower_bound(sum);
+        }
+        
+        if (cnt > max_cnt) {
+            max_cnt = cnt;
+            
+            for (int j = 0; j < n / 2; j++) {
+                answer[j] = diceA[j] + 1;
+            }
+        }
+    } 
     return answer;
-}   
+}
