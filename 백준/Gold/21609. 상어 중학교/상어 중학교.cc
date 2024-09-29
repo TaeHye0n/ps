@@ -1,191 +1,180 @@
 #include <iostream>
 #include <vector>
-#include <queue>
+#include <string>
 #include <algorithm>
+#include <cstring>
+#include <queue>
+#include <climits>
 
+#define FAST_IO ios_base::sync_with_stdio(false); cin.tie(nullptr); cout.tie(nullptr)
+#define Y first
+#define X second
+#define endl "\n"
+
+#define MAX 21
 using namespace std;
+typedef long long ll;
 
+const int dy[4] = {1, -1, 0, 0};
+const int dx[4] = {0, 0, 1, -1};
 struct group {
-	int size;
-	int rainbowCnt;
-	int y; // 기준 블럭
-	int x;
-	vector<pair<int, int>> pos;
+    int cnt;
+    int rainbow_cnt;
+    int y;
+    int x;
+    vector<pair<int, int>> blocks;
 };
+int board[MAX][MAX];
+int N, M;
 
-const int MAX = 21;
-const int dy[4] = { -1,0,0,1 };
-const int dx[4] = { 0,-1,1,0 };
-int N;// 격자 한변의 크기
-int M; // 색상의 개수 (검은색 무지개 제외)
-int map[MAX][MAX];
-bool visited[MAX][MAX];
-bool rainbowVisited[MAX][MAX];
-vector<group> groups;
-bool isEnd;
-int ans;
-
-void input() {
-	cin >> N >> M;
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			cin >> map[i][j];
-		}
-	}
+bool cmp(group &g1, group &g2) {
+    if (g1.cnt == g2.cnt) {
+        if (g1.rainbow_cnt == g2.rainbow_cnt) {
+            if (g1.y == g2.y) {
+                return g1.x > g2.x;
+            }
+            return g1.y > g2.y;
+        }
+        return g1.rainbow_cnt > g2.rainbow_cnt;
+    }
+    return g1.cnt > g2.cnt;
 }
 
-bool compareGroups(group g1, group g2) {
-	if (g1.size == g2.size) {
-		if (g1.rainbowCnt == g2.rainbowCnt) {
-			if (g1.y == g2.y) {
-				return g1.x > g2.x;
-			}return g1.y > g2.y;
-		} return g1.rainbowCnt > g2.rainbowCnt;
-	}return g1.size > g2.size;
+void do_gravity() {
+    for (int i = N - 1; i >= 0; i--) {
+        for (int j = 0; j < N; j++) {
+            // 검은색이거나 빈칸인 경우 패스
+            if (board[i][j] == -1 || board[i][j] == -2) continue;
+
+            int ny = i;
+            while (1) {
+                ny += dy[0];
+
+                if (ny >= N || board[ny][j] != -2) break;
+            }
+            ny--;
+            if (ny == i) continue;
+            int temp = board[i][j];
+            board[ny][j] = temp;
+            board[i][j] = -2;
+        }
+    }
 }
 
-void bfs(int a, int b, int color) {
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			rainbowVisited[i][j] = false;
-		}
-	}
-	queue<pair<int, int>> q;
-	vector<pair<int, int>> allBlocks;
-	q.push({ a,b });
-	allBlocks.push_back({ a,b });
-	visited[a][b] = true;
-	int miny = a;
-	int minx = b;
-	int cnt = 0;
-	while (!q.empty()) {
-		int y = q.front().first;
-		int x = q.front().second;
-		q.pop();
+void rotate_counterclockwise() {
+    int temp[MAX][MAX];
 
-		for (int w = 0; w < 4; w++) {
-			int ny = y + dy[w];
-			int nx = x + dx[w];
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            temp[i][j] = board[j][N - 1 - i];
+        }
+    }
 
-			if (ny < 0 || nx < 0 || ny >= N || nx >= N) continue;
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            board[i][j] = temp[i][j];
+        }
+    }
 
-			if (map[ny][nx] == 0 && rainbowVisited[ny][nx] == false) {
-				q.push({ ny,nx });
-				rainbowVisited[ny][nx] = true;
-				allBlocks.push_back({ ny,nx });
-				cnt++;
-			}
-			else if (map[ny][nx] == color && visited[ny][nx] == false) {
-				q.push({ ny,nx });
-				visited[ny][nx] = true;
-				allBlocks.push_back({ ny,nx });
-				if (miny > ny) {
-					miny = ny;
-					minx = nx;
-				}
-				else if (miny == ny && minx > nx) {
-					minx = nx;
-				}
-			}
-		}
-	}
-	if (allBlocks.size() < 2) return;
-	group g;
-	g.y = miny;
-	g.x = minx;
-	g.size = allBlocks.size();
-	g.rainbowCnt = cnt;
-	g.pos = allBlocks;
-	groups.push_back(g);
 }
-void solve() {
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			visited[i][j] = false;
-		}
-	}
-	groups.clear();
-	// 가장 큰 그룹 찾기
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			if (!visited[i][j] && map[i][j] > 0) {
-				bfs(i, j, map[i][j]);
-			}
-		}
-	}
-	if (groups.empty()) {
-		isEnd = true;
-		return;
-	}
-	sort(groups.begin(), groups.end(), compareGroups);
-	group maxGroup = groups[0];
 
-	// 가장 큰 그룹 제거
-	for (int i = 0; i < maxGroup.pos.size(); i++) {
-		int y = maxGroup.pos[i].first;
-		int x = maxGroup.pos[i].second;
-		map[y][x] = -2;
-	}
-	ans += maxGroup.size * maxGroup.size;
-
-	// 중력 작용
-	for (int i = N - 2; i >= 0; i--) {
-		for (int j = 0; j < N; j++) {
-			if (map[i][j] <= -1) continue;
-			int ny = i;
-			while (1) {
-				ny++;
-				if (ny >= N || map[ny][j] != -2) {
-					ny--;
-					break;
-				}
-			}
-			int temp = map[i][j];
-			map[i][j] = -2;
-			map[ny][j] = temp;
-		}
-	}
-
-	// 반시계로 90도 회전
-	int newMap[MAX][MAX] = { 0, };
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			newMap[i][j] = map[j][N - i - 1];
-		}
-	}
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			map[i][j] = newMap[i][j];
-		}
-	}
-
-	// 중력 작용
-	for (int i = N - 2; i >= 0; i--) {
-		for (int j = 0; j < N; j++) {
-			if (map[i][j] <= -1) continue;
-			int ny = i;
-			while (1) {
-				ny++;
-				if (ny >= N || map[ny][j] != -2) {
-					ny--;
-					break;
-				}
-			}
-			int temp = map[i][j];
-			map[i][j] = -2;
-			map[ny][j] = temp;
-		}
-	}
-}
 int main() {
-	ios_base::sync_with_stdio(false);
-	cin.tie(nullptr);
-	cout.tie(nullptr);
+    FAST_IO;
+    cin >> N >> M;
 
-	input();
-	while (!isEnd) {
-		solve();
-	}
-	cout << ans;
-	return 0;
+    int score = 0;
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            cin >> board[i][j];
+        }
+    }
+
+    while (1) {
+        bool visited[MAX][MAX] = {false,};
+        vector<group> groups;
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (board[i][j] >= 1 && !visited[i][j]) {
+                    queue<pair<int, int>> q;
+                    visited[i][j] = true;
+                    bool rainbow_visited[MAX][MAX] = {false,};
+                    q.push({i, j});
+                    int cnt = 1, rainbow_cnt = 0;
+                    vector<pair<int, int>> blocks;
+                    blocks.push_back({i, j});
+                    int minY = i;
+                    int minX = j;
+
+                    while (!q.empty()) {
+                        int cy = q.front().Y;
+                        int cx = q.front().X;
+                        q.pop();
+
+                        for (int w = 0; w < 4; w++) {
+                            int ny = cy + dy[w];
+                            int nx = cx + dx[w];
+
+                            if (ny < 0 || nx < 0 || ny >= N || nx >= N) continue;
+
+                            if (board[ny][nx] == -1) continue;
+
+                            if (visited[ny][nx]) continue;
+
+                            // 방문하지 않은 무지개 블록
+                            if (!rainbow_visited[ny][nx] && board[ny][nx] == 0) {
+                                rainbow_visited[ny][nx] = true;
+                                rainbow_cnt++;
+                                cnt++;
+                                q.push({ny, nx});
+                                blocks.push_back({ny, nx});
+                                continue;
+                            }
+
+                            // 같은 색 블록
+                            if (board[ny][nx] == board[i][j]) {
+                                visited[ny][nx] = true;
+                                cnt++;
+                                q.push({ny, nx});
+                                blocks.push_back({ny, nx});
+
+                                if (minY > ny) {
+                                    minY = ny;
+                                    minX = nx;
+                                } else if (minY == ny && minX > nx) {
+                                    minX = nx;
+                                }
+                            }
+                        }
+                    }
+                    if (cnt < 2) continue;
+                    groups.push_back({cnt, rainbow_cnt, minY, minX, blocks});
+                }
+            }
+        }
+
+        if (groups.empty()) {
+            break;
+        }
+        sort(groups.begin(), groups.end(), cmp);
+        // 2 모든 블록 제거
+        group g = groups.front();
+        vector<pair<int, int>> blocks = g.blocks;
+        score += (g.cnt * g.cnt);
+        for (int i = 0; i < blocks.size(); i++) {
+            board[blocks[i].Y][blocks[i].X] = -2; // -2는 빈칸
+        }
+
+        // 3. 중력
+        do_gravity();
+
+        // 4. 90도 반시계 회전
+        rotate_counterclockwise();
+
+        // 5. 중력
+        do_gravity();
+    }
+    cout << score;
+
+    return 0;
 }
+
