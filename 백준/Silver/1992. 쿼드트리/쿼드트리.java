@@ -1,38 +1,36 @@
-import java.io.*;
 import java.util.*;
+import java.io.*;
 
 public class Main {
-    static int N;
-    static int[][] board;
+
+    static int n;
+    static List<String> board = new ArrayList<>();
     static StringBuilder sb = new StringBuilder();
-
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        N = Integer.parseInt(br.readLine());
-        board = new int[N+1][N+1];
+        n = stoi(br.readLine());
 
-        for (int i = 0; i < N; i++) {
-            String str = br.readLine();
-            for (int j = 0; j < N; j++) {
-                board[i][j] = str.charAt(j) - '0';
-            }
+        for (int i = 0; i < n; i++) {
+            board.add(br.readLine());
         }
-        func(0, 0, N);
-        System.out.println(sb.toString());
 
+        recur(0, 0, n);
+        System.out.println(sb);
     }
 
-    private static void func(int y, int x, int n) {
-        if (n == 1) {
-            sb.append(board[y][x]);
+    static void recur(int y, int x, int k) {
+        if (k == 1) {
+            sb.append(board.get(y).charAt(x));
             return;
         }
 
-        boolean zero = true, one = true;
-        for (int i = y; i < y + n; i++) {
-            for (int j = x; j < x + n; j++) {
-                if (board[i][j] == 1) zero = false;
-                else one = false;
+        boolean one = true;
+        boolean zero = true;
+        for (int i = y; i < y + k; i++) {
+            for (int j = x; j < x + k; j++) {
+                if (!zero && !one) break;
+                if (board.get(i).charAt(j) == '0') one = false;
+                else if (board.get(i).charAt(j) == '1') zero = false;
             }
         }
 
@@ -40,12 +38,15 @@ public class Main {
         else if (one) sb.append(1);
         else {
             sb.append("(");
-            func(y, x, n/2);
-            func(y, x + n/2, n/2);
-            func(y + n/2, x, n/2);
-            func(y + n/2, x + n/2, n/2);
+            recur(y, x, k / 2);
+            recur(y, x + k / 2, k / 2);
+            recur(y + k / 2, x, k / 2);
+            recur(y + k / 2, x + k / 2, k / 2);
             sb.append(")");
         }
+    }
+    static int stoi(String s) {
+        return Integer.parseInt(s);
     }
 
 }
